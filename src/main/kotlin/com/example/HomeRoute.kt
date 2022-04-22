@@ -2,6 +2,7 @@ package com.example
 
 import com.slack.api.bolt.App
 import com.slack.api.bolt.AppConfig
+import com.slack.api.bolt.request.Request
 import com.slack.api.bolt.request.RequestHeaders
 import com.slack.api.bolt.response.Response
 import com.slack.api.bolt.util.QueryStringParser
@@ -41,9 +42,14 @@ fun Routing.homeRoute() {
             ctx.ack("Nieprawidłowa kategoria: ${req.payload.text}")
         }
     }
+
+
+    post("/commands") {
+        respond(call, app.run(parseRequest(call)))
+    }
 }
 
-suspend fun parseRequest(call: ApplicationCall): Any {
+suspend fun parseRequest(call: ApplicationCall): Request<*> {
     val body = call.receiveText()
     return requestParser.parse(
         SlackRequestParser.HttpRequest.builder()
